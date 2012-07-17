@@ -4,3 +4,8 @@
 *.jar
 *.war
 *.ear
+
+.idea/
+atlassian-ide-plugin.xml
+
+Java-Aspect-Messenger.iml
