@@ -13,13 +13,12 @@ package com.scottbyrns;
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  * <p/>
- * Created 7/17/12 11:11 AM
+ * Created 7/17/12 3:28 PM
  */
-@java.lang.annotation.Inherited
-@java.lang.annotation.Target({java.lang.annotation.ElementType.TYPE, java.lang.annotation.ElementType.METHOD})
-@java.lang.annotation.Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
-public @interface RegisterAsCallback
+public class SendMessageFromAnotherClass
 {
-    String group() default "GLOBAL";
-    String channel() default "PUBLIC";
+    public static void sendMessage() {
+        MessageController.sendMessage("Unit-Test",
+                                      Message.create(new SendMessageFromAnotherClass()));
+    }
 }

@@ -21,9 +21,7 @@ Many classes can register callbacks for the same key.
     .
     .
     {
-        MessageController messageController = new MessageController();
-        messageController.registerListenersOfClass(getClass(), this);
-        
-        messageController.sendMessage("user-did-update-profile");
+        MessageController.registerListenersOfClass(getClass(), this);
+        MessageController.sendMessage("user-did-update-profile", userProfileEntity);
     }    
 ```

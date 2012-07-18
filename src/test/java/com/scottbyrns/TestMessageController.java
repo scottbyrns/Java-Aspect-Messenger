@@ -2,6 +2,8 @@ package com.scottbyrns;
 
 import org.junit.Test;
 
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 
 /**
@@ -24,18 +26,21 @@ public class TestMessageController
 
     private boolean failed = true;
 
-    @RegisterAsCallback("Unit Test")
-    public void handleMessage () {
+    @RegisterAsCallback(
+            group = "Unit-Test"
+    )
+    public void handleMessage (Message message) {
+        assertTrue((message.getData() instanceof SendMessageFromAnotherClass) || (message.getData() instanceof TestMessageController));
         failed = false;
     }
 
     @Test
     public void testRegisteringListenersOfClass() throws Exception
     {
-        MessageController messageController = new MessageController();
-        messageController.registerListenersOfClass(getClass(), this);
+        MessageController.registerListenersOfClass(getClass(), this);
+        MessageController.sendMessage("Unit-Test", this);
 
-        messageController.sendMessage("Unit Test");
+        SendMessageFromAnotherClass.sendMessage();
 
         if (failed) {
             fail("The message did not reach the handler.");

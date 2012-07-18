@@ -1,5 +1,6 @@
 package com.scottbyrns;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -23,19 +24,50 @@ public class ScopedMethod
 {
     private Object context;
     private Method method;
+    private String channel;
 
-    public ScopedMethod(Object context, Method method)
+    public ScopedMethod(Object context, Method method, String channel)
     {
         this.context = context;
         this.method = method;
+        this.channel = channel;
     }
 
     /**
      * Invoke the method in its scope.
      */
-    public void invoke() {
+    public void invoke(Message message) {
         try {
-            getMethod().invoke(getContext());
+
+            boolean isVoidReturn = getMethod().getReturnType().getSimpleName().equals("void");
+            boolean isOneArgument = getMethod().getParameterTypes().length == 1;
+            if (isVoidReturn && isOneArgument) {
+                boolean argumentIsMethod = method.getParameterTypes()[0].getSimpleName().equals(Message.class.getSimpleName());
+                if (argumentIsMethod) {
+                    try {
+                        if (message.getChannel().equals("PUBLIC") || message.getChannel().equals(getChannel())) {
+                            getMethod().invoke(getContext(), Message.copy(message));
+                        }
+                    }
+                    catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                        throw new Exception("Method: " + getContext().getClass().getSimpleName() + "#" + method.getName() + "(Message message) threw an internal exception preventing invocation.");
+                    }
+                }
+                else {
+                    new Exception("Method: " + method.getName() + " does not accept a Message object as an argument.").printStackTrace();
+                }
+            }
+            else if (!isVoidReturn) {
+                new Exception("Method: " + method.getName() + " is required to have a void return type.").printStackTrace();
+            }
+            else if (!isOneArgument) {
+                new Exception("Method: " + method.getName() + " takes more than one argument.").printStackTrace();
+            }
+            else {
+                new Exception("Method: " + method.getName() + " could not be called. Not sure why.").printStackTrace();
+            }
+
         }
         catch (Throwable e) {
             e.printStackTrace();
@@ -61,5 +93,15 @@ public class ScopedMethod
     public void setMethod(Method method)
     {
         this.method = method;
+    }
+
+    public String getChannel()
+    {
+        return channel;
+    }
+
+    public void setChannel(String channel)
+    {
+        this.channel = channel;
     }
 }

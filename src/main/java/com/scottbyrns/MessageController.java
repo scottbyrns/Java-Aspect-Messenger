@@ -26,44 +26,38 @@ import java.util.*;
  */
 public class MessageController
 {
-    private Map<String, List<ScopedMethod>> methods;
+    private static Map<String, List<ScopedMethod>> methods = new HashMap<String, List<ScopedMethod>>();
 
-    public MessageController()
-    {
-        Map<String, List<ScopedMethod>> enumeratedKeyListMap = new HashMap<String, List<ScopedMethod>>();
-        setMethods(enumeratedKeyListMap);
-    }
-
-    private Map<String, List<ScopedMethod>> getMethods()
+    private static Map<String, List<ScopedMethod>> getMethods()
     {
         return methods;
     }
 
-    private void setMethods(Map<String, List<ScopedMethod>> methods)
+    private static void setMethods(Map<String, List<ScopedMethod>> methods)
     {
-        this.methods = methods;
+        MessageController.methods = methods;
     }
 
     /**
      * Register a listener.
      *
-     * @param key The key path to the listener.
+     * @param registerAsCallback Annotated description of message registration.
      * @param callback The method to callback to when a message is sent.
      * @param context The execution context to execute a method callback in.
      */
-    public void registerListener(String key, Method callback, Object context) {
+    private static void registerListener(RegisterAsCallback registerAsCallback, Method callback, Object context) {
         List<ScopedMethod> methodList;
-        ScopedMethod scopedMethod = new ScopedMethod(context, callback);
-        if (null != getMethods().get(key)) {
-            methodList = getMethods().get(key);
+        ScopedMethod scopedMethod = new ScopedMethod(context, callback, registerAsCallback.channel());
+
+        if (null != getMethods().get(registerAsCallback.group())) {
+            methodList = getMethods().get(registerAsCallback.group());
             methodList.add(scopedMethod);
         }
         else {
             methodList = new ArrayList<ScopedMethod>();
             methodList.add(scopedMethod);
-            getMethods().put(key, methodList);
+            getMethods().put(registerAsCallback.group(), methodList);
         }
-
 
     }
 
@@ -73,7 +67,7 @@ public class MessageController
      * @param clazz The class to register callbacks for.
      * @param context The execution context to run class listeners in.
      */
-    public void registerListenersOfClass(Class clazz, Object context) {
+    public static void registerListenersOfClass(Class clazz, Object context) {
         Method[] clazzMethods = clazz.getMethods();
         for (Method method: clazzMethods) {
             RegisterAsCallback registerAsCallback = method.getAnnotation(RegisterAsCallback.class);
@@ -82,7 +76,7 @@ public class MessageController
             }
 
 
-            registerListener(registerAsCallback.value(), method, context);
+            registerListener(registerAsCallback, method, context);
         }
     }
 
@@ -91,14 +85,35 @@ public class MessageController
      *
      * @param key The handler set to invoke.
      */
-    public void sendMessage(String key) {
+    public static void sendMessage(String key, Message message) {
         List<ScopedMethod> methodList = getMethods().get(key);
         Iterator<ScopedMethod> methodIterator = methodList.iterator();
         ScopedMethod scopedMethod;
         while (methodIterator.hasNext()) {
             try {
                 scopedMethod = methodIterator.next();
-                scopedMethod.invoke();
+                scopedMethod.invoke(message);
+            }
+            catch (Throwable e) {
+                e.printStackTrace();
+                // Muck all exceptions.
+            }
+        }
+    }
+
+    /**
+     * Send a message to a message handler.
+     *
+     * @param key The handler set to invoke.
+     */
+    public static void sendMessage(String key, Object message) {
+        List<ScopedMethod> methodList = getMethods().get(key);
+        Iterator<ScopedMethod> methodIterator = methodList.iterator();
+        ScopedMethod scopedMethod;
+        while (methodIterator.hasNext()) {
+            try {
+                scopedMethod = methodIterator.next();
+                scopedMethod.invoke(Message.create(message));
             }
             catch (Throwable e) {
                 e.printStackTrace();
