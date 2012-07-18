@@ -4,6 +4,21 @@ Send aspect messages to disparate class methods.
 
 ## Project information
 
+```xml
+<repositories>
+    <repository>
+        <id>scottbyrns-snapshots</id>
+        <url>https://github.com/scottbyrns/Scottbyrns-Maven-Repo/raw/master/snapshots</url>
+    </repository>
+</repositories>
+
+<dependency>
+    <groupId>com.scottbyrns</groupId>
+    <artifactId>Java-Aspect-Messenger</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+</dependency>
+```
+
 * Source: https://github.com/scottbyrns/Java-Aspect-Messenger
 
 ## Usage
