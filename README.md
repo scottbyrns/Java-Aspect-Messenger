@@ -23,8 +23,14 @@ Many classes can register callbacks for the same key.
     .
     .
     {
-        MessageController.registerListenersOfClass(getClass(), this);
-        MessageController.sendMessage("user-did-update-profile", userProfileEntity);
+        MessageController.registerListenersOfClass(
+            getClass(),
+            this
+        );
+        MessageController.sendMessage(
+            "user-did-update-profile",
+            userProfileEntity
+        );
     }    
 ```
 
@@ -44,6 +50,12 @@ A channel is a way of routing messages to a sub grouping of handlers.
     .
     {
         MessageController.registerListenersOfClass(getClass(), this);
-        MessageController.sendMessage("user-did-update-profile", Message.create("updated-user-name", userProfileEntity));
+        MessageController.sendMessage(
+            "user-did-update-profile",
+            Message.create(
+                "updated-user-name",
+                userProfileEntity
+            )
+        );
     }
 ```
