@@ -33,7 +33,8 @@ public class TestMessageController
     public void testRegisteringListenersOfClass() throws Exception
     {
         MessageController messageController = new MessageController();
-        messageController.registerListenersOfClass(TestMessageController.class, this);
+        messageController.registerListenersOfClass(getClass(), this);
+
         messageController.sendMessage("Unit Test");
 
         if (failed) {

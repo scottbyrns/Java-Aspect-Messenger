@@ -82,7 +82,7 @@ public class MessageController
             }
 
 
-            registerListener(registerAsCallback.group(), method, context);
+            registerListener(registerAsCallback.value(), method, context);
         }
     }
 
