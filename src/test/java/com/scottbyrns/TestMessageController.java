@@ -2,9 +2,7 @@ package com.scottbyrns;
 
 import org.junit.Test;
 
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
+import static junit.framework.Assert.*;
 
 /**
  * Copyright (C) 2012 by Scott Byrns
@@ -25,12 +23,14 @@ public class TestMessageController
 {
 
     private boolean failed = true;
+    private int callCount = 0;
 
     @RegisterAsCallback(
             group = "Unit-Test"
     )
     public void handleMessage (Message message) {
         assertTrue((message.getData() instanceof SendMessageFromAnotherClass) || (message.getData() instanceof TestMessageController));
+        callCount += 1;
         failed = false;
     }
 
@@ -42,8 +42,21 @@ public class TestMessageController
 
         SendMessageFromAnotherClass.sendMessage();
 
+
         if (failed) {
             fail("The message did not reach the handler.");
         }
+    }
+
+    @Test
+    public void testUnregisteringListenersOfClass() throws Exception
+    {
+        MessageController.registerListenersOfClass(getClass(), this);
+        MessageController.sendMessage("Unit-Test", this);
+
+        MessageController.unregisterListenersOfClass(getClass());
+        SendMessageFromAnotherClass.sendMessage();
+
+        assertEquals("Handler should be unregistered and execution count should be one.", 1, callCount);
     }
 }

@@ -80,6 +80,34 @@ public class MessageController
         }
     }
 
+    public static void unregisterListenersOfClass(Class clazz) {
+        Method[] clazzMethods = clazz.getMethods();
+        for (Method method: clazzMethods) {
+            RegisterAsCallback registerAsCallback = method.getAnnotation(RegisterAsCallback.class);
+            if (null == registerAsCallback) {
+                continue;
+            }
+
+
+            unregisterListener(registerAsCallback, method);
+        }
+    }
+
+    public static void unregisterListener(RegisterAsCallback registerAsCallback, Method method) {
+        List<ScopedMethod> scopedMethods = getMethods().get(registerAsCallback.group());
+        Iterator<ScopedMethod> iterator = scopedMethods.iterator();
+
+        ScopedMethod scopedMethod;
+        ScopedMethod methodToRemove = null;
+        while (iterator.hasNext()) {
+            scopedMethod = iterator.next();
+            if (scopedMethod.getMethod().toGenericString().equals(method.toGenericString())) {
+                methodToRemove = scopedMethod;
+            }
+        }
+        scopedMethods.remove(methodToRemove);
+    }
+
     /**
      * Send a message to a message handler.
      *
