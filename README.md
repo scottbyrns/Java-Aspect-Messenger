@@ -13,7 +13,9 @@ Send aspect messages to disparate class methods.
 Many classes can register callbacks for the same key.
 
 ```java
-    @RegisterAsCallback("user-did-update-profile")
+    @RegisterAsCallback(
+        group = "user-did-update-profile"
+    )
     public void refreshProfile () {
         // Handler body
     }
@@ -24,4 +26,24 @@ Many classes can register callbacks for the same key.
         MessageController.registerListenersOfClass(getClass(), this);
         MessageController.sendMessage("user-did-update-profile", userProfileEntity);
     }    
+```
+
+### Channels
+
+A channel is a way of routing messages to a sub grouping of handlers.
+```java
+    @RegisterAsCallback(
+        group = "user-did-update-profile",
+        channel = "updated-user-name"
+    )
+    public void refreshProfile () {
+        // Handler body
+    }
+    .
+    .
+    .
+    {
+        MessageController.registerListenersOfClass(getClass(), this);
+        MessageController.sendMessage("user-did-update-profile", Message.create("updated-user-name", userProfileEntity));
+    }
 ```
