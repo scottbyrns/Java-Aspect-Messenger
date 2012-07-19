@@ -136,6 +136,9 @@ public class MessageController
      */
     public static void sendMessage(String key, Object message) {
         List<ScopedMethod> methodList = getMethods().get(key);
+        if (null == methodList) {
+            return;
+        }
         Iterator<ScopedMethod> methodIterator = methodList.iterator();
         ScopedMethod scopedMethod;
         while (methodIterator.hasNext()) {

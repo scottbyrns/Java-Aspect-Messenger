@@ -59,4 +59,9 @@ public class TestMessageController
 
         assertEquals("Handler should be unregistered and execution count should be one.", 1, callCount);
     }
+
+    @Test
+    public void testSendMessageToGroupWithNoHandlers () {
+        MessageController.sendMessage("Unit-Test", this);
+    }
 }
