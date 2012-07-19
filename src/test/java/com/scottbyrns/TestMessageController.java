@@ -62,6 +62,7 @@ public class TestMessageController
 
     @Test
     public void testSendMessageToGroupWithNoHandlers () {
-        MessageController.sendMessage("Unit-Test", this);
+        MessageController.sendMessage("Unit-Test-No-Handlers", this);
+        MessageController.sendMessage("NO-HANDLERS", Message.create("test"));
     }
 }
